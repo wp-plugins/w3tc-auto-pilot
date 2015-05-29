@@ -7,7 +7,7 @@ Stable tag: 4.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache without doing a anything. So your cache is always up to date.
+Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache by simply updating your website. So your cache is always up to date.
 
 == Description ==
 
