@@ -11,12 +11,13 @@ Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cac
 
 == Description ==
 
-This plugin puts your W3 Total Cache configuration on auto pilot.
+= This plugin puts your W3 Total Cache configuration on auto pilot. =
 
 It's especially handy when you have users that don't have access to W3 Total Cache control but still need to purge the cache.
+
 It's also brilliant when you have created a blog for a customer, this way they won't even know it's there: All cache is purged automatically.
 
-It's also great on MultiSite installations, especially when you allow untrusted users to create a blog. 
+It's absolutely great on MultiSite installations, especially when you allow untrusted users to create a blog. 
 
 **What this plugin does:**
 
@@ -38,7 +39,7 @@ It's also great on MultiSite installations, especially when you allow untrusted 
 * Purge cache each time a sidebar is updated. 
 * Purge cache each time the user finishes editing the theme in: 
  * Customizer. 
- * Switch theme. 
+ * or switches theme. 
 
 == Installation ==
 
@@ -46,17 +47,11 @@ It's also great on MultiSite installations, especially when you allow untrusted 
 1. Activate this plugin either through Network Activation or per site. 
 1. That's it! There are currently no options available. 
 
-== Frequently Asked Questions ==
-
-== Screenshots ==
-
 == Changelog ==
 
 = 1.0.0 =
 * Initial Release 
 
-== Upgrade Notice ==
-
-== Arbitrary section ==
+== Developer Notes ==
 
 If you wish to edit this plugin, all you need to do is uncomment stuff in function wap_w3tc_init(), every line is documented there.
