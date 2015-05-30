@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -46,6 +46,9 @@ function wap_w3tc_init() {
 	
 	//* Removes the W3 Total Cache comments in the HTML output
 	add_filter( 'w3tc_can_print_comment', '__return_false', 20 );
+	
+	//* Removes admin notices for non-super-admins
+	add_action( 'admin_init', 'wap_w3tc_remove_notices', 20);
 	
 }
 add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before init and admin_init
@@ -129,8 +132,8 @@ function wap_w3tc_remove_adminbar() {
 function wap_w3tc_remove_adminmenu() {
 	global $submenu,$menu;
 	
-	if( !is_super_admin() ) {
-		if(!empty($menu)) {
+	if ( ! is_super_admin() ) {
+		if ( ! empty($menu) ) {
 			foreach($menu as $key => $submenuitem) {
 			if( __($submenuitem[0]) == __('Performance') || $submenuitem[2] == "w3tc_dashboard") {
 				unset($menu[$key]);
@@ -145,7 +148,7 @@ function wap_w3tc_remove_adminmenu() {
 }
 
 function wap_w3tc_remove_flush_per_post_page() {
-	if (!is_super_admin() ) {
+	if ( !is_super_admin() ) {
 		
 		if ( function_exists( 'w3_instance' ) ) {
 			$w3_actions = w3_instance('W3_GeneralActions');
@@ -169,4 +172,11 @@ function wap_w3tc_remove_row($actions) {
 	unset( $actions['pgcache_purge'] );
 	
 	return $actions;
+}
+
+function wap_w3tc_remove_notices() {
+	if ( !is_super_admin() ) {
+		add_filter('w3tc_errors', '__return_false');
+		add_filter('w3tc_notes', '__return_false');
+	}
 }

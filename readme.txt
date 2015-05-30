@@ -26,6 +26,7 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 * No more purge from cache button on pages and posts edit screens. 
 * No more admin menu in the admin bar. 
 * No more admin menu in the dashboard. 
+* No more admin notices in the dashboard after settings change or on error.
 
 ***On the front end:***
 
@@ -48,6 +49,9 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 1. That's it! There are currently no options available. 
 
 == Changelog ==
+
+= 1.0.1 =
+* Removed admin notices and errors for non-super-admins (MultiSite) / non-admins (single)
 
 = 1.0.0 =
 * Initial Release 
