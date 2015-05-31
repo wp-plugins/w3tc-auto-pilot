@@ -38,14 +38,18 @@ function wap_w3tc_init() {
 	add_action( 'admin_bar_menu', 'wap_w3tc_remove_adminbar', 20 );
 	
 	//* Removes admin menu entry of W3 Total Cache
-	add_action( 'admin_menu', 'wap_w3tc_remove_adminmenu', 20 ); 
+	add_action( 'admin_menu', 'wap_w3tc_remove_adminmenu', 20 );
+	
+	//* Removes admin menu popup script 
+	// Can't be done.
+//	add_action( 'init', 'wap_w3tc_remove_script', 20);
 	
 	//* Removes "Purge From Cache" link above the "publish/save" button on posts/pages
 	//* Also removes the "Purge From Cache" link in post/pages lists
-	add_action( 'admin_init', 'wap_w3tc_remove_flush_per_post_page', 20 ); 
+	add_action( 'admin_init', 'wap_w3tc_remove_flush_per_post_page', 20); 
 	
 	//* Removes the W3 Total Cache comments in the HTML output
-	add_filter( 'w3tc_can_print_comment', '__return_false', 20 );
+	add_filter( 'w3tc_can_print_comment', '__return_false', 20);
 	
 	//* Removes admin notices for non-super-admins
 	add_action( 'admin_init', 'wap_w3tc_remove_notices', 20);
@@ -53,6 +57,7 @@ function wap_w3tc_init() {
 }
 add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before init and admin_init
 
+	
 function wap_w3tc_flush_all() {
 	
 	// Purge the entire db cache
@@ -124,11 +129,38 @@ function wap_w3tc_flush_object() {
 function wap_w3tc_remove_adminbar() {
 	global $wp_admin_bar;
 	
+	// Remove admin menu
 	if ( !is_super_admin() ) {
 		$wp_admin_bar->remove_menu('w3tc');
+	}	
+}
+
+function wap_w3tc_remove_script() {
+	if ( !is_super_admin() ) {
+		
+		if ( function_exists( 'w3_instance' ) ) {
+			$w3_plugin = w3_instance('W3_Plugin_TotalCache');
+		}
+		
+		// Remove popupadmin script
+		// @Frederick, Why did you use wp_print_scripts? See https://codex.wordpress.org/Plugin_API/Action_Reference/wp_print_scripts
+		// Even more so, why did you call the action outside of the constructor?
+		add_action( 'init', array( 
+			$w3_plugin,
+			'wap_w3tc_remove_script_ext'
+			), 10);
+			// Well, I tried. This doesn't work.
 	}
 }
+
+function wap_w3tc_remove_script_ext() {
+	if ( function_exists( 'w3_instance' ) ) {
+		$w3_plugin = w3_instance('W3_Plugin_TotalCache');
+	}
 	
+	remove_action( 'wp_print_scripts', array( $w3_plugin, 'popup_script' ), 10);	
+}
+
 function wap_w3tc_remove_adminmenu() {
 	global $submenu,$menu;
 	
