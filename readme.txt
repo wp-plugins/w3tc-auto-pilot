@@ -1,6 +1,6 @@
 === W3TC Auto Pilot ===
 Contributors: cybr
-Tags: cache, control, w3, total
+Tags: cache, control, w3, total, automatic, flush, update, multisite, mapping, hide
 Requires at least: 3.6.0
 Tested up to: 4.2.2
 Stable tag: 4.2.2
@@ -50,8 +50,11 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 
 == Changelog ==
 
+= 1.0.3 = 
+* Fine tuned the purging of page cache to only when a domain is actually mapped.
+
 = 1.0.2 = 
-* Added forced page cache purging on each post save when Domain Mapping (by WPMUdev) is active
+* Added forced page cache purging on each post save when Domain Mapping (by WPMUdev) is active. This will fix a bug with Domain Mapping.
 
 = 1.0.1 =
 * Removed admin notices and errors for non-super-admins (MultiSite) / non-admins (single)

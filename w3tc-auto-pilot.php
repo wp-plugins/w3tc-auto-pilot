@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -61,8 +61,21 @@ add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before i
 
 function wap_mapped_clear() {
 	//* Check for domain-mapping plugin
-	if ( is_plugin_active( 'domain-mapping/domain-mapping.php' ))
-		add_action( 'save_post', 'wap_w3tc_flush_page' );
+	if ( is_plugin_active( 'domain-mapping/domain-mapping.php' )) {
+		global $wpdb,$blog_id;
+				
+		$ismapped = wp_cache_get('wap_mapped_clear_' . $blog_id, 'domain_mapping' );
+		if ( false === $ismapped ) {
+			$ismapped = $wpdb->get_var( $wpdb->prepare( "SELECT domain FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //string
+			wp_cache_set('wap_mapped_clear_' . $blog_id, $ismapped, 'domain_mapping', 3600 ); // 1 hour
+		}
+		
+		//* string $ismapped, if mapped != ''
+		if ( !empty($ismapped) ) {						
+//			add_action( 'save_post', 'wap_w3tc_flush_single_post' ); // Doesn't work unfortunately with Domain Mapping... somehow 2 ID's are being created?
+			add_action( 'save_post', 'wap_w3tc_flush_page' ); // So we just flush it entirely. But only if the domain is mapped! :D
+		}
+	}
 }
 	
 function wap_w3tc_flush_all() {
@@ -113,6 +126,18 @@ function wap_w3tc_flush_all_widget($instance, $new_instance, $old_instance, $thi
 	
 	//* Pass $instance to parse updating
 	return $instance;
+}
+
+function wap_w3tc_flush_single_post() {
+	
+	// Purge the single page cache
+	if ( function_exists( 'w3tc_pgcache_flush_post' ) ) {
+		global $post;
+		$post_id = $post->ID;
+			
+		w3tc_pgcache_flush_post($post_id);
+	}
+	
 }
 
 function wap_w3tc_flush_page() {
