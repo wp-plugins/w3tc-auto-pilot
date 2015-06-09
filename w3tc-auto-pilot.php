@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -54,9 +54,16 @@ function wap_w3tc_init() {
 	//* Removes admin notices for non-super-admins
 	add_action( 'admin_init', 'wap_w3tc_remove_notices', 20);
 	
+	//* Added functionality to prevent cache bugs with Domain Mapping (by WPMUdev)
+	add_action( 'admin_init', 'wap_mapped_clear', 20);
 }
 add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before init and admin_init
 
+function wap_mapped_clear() {
+	//* Check for domain-mapping plugin
+	if ( is_plugin_active( 'domain-mapping/domain-mapping.php' ))
+		add_action( 'save_post', 'wap_w3tc_flush_page' );
+}
 	
 function wap_w3tc_flush_all() {
 	

@@ -50,6 +50,9 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 
 == Changelog ==
 
+= 1.0.2 = 
+* Added forced page cache purging on each post save when Domain Mapping (by WPMUdev) is active
+
 = 1.0.1 =
 * Removed admin notices and errors for non-super-admins (MultiSite) / non-admins (single)
 
