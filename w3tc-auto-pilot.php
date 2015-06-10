@@ -30,7 +30,7 @@ function wap_w3tc_init() {
 	
 	//* Adds advanced flushing on update of certain items (especially related to object cache)
 	//* Usage of each action hook is documented above under Developer Notes
-	add_action( 'after_switch_theme', 'wap_w3tc_flush_all' );	
+	add_action( 'after_switch_theme', 'wap_w3tc_flush_all' );
 	add_action( 'customize_save_after', 'wap_w3tc_flush_all' );
 	add_filter( 'widget_update_callback', 'wap_w3tc_flush_all_widget', 11, 4 ); // Will not always fire, but does the job :)
 	
@@ -61,7 +61,7 @@ add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before i
 
 function wap_mapped_clear() {
 	//* Check for domain-mapping plugin
-	if ( is_plugin_active( 'domain-mapping/domain-mapping.php' )) {
+	if ( is_plugin_active( 'domain-mapping/domain-mapping.php' ) ) {
 		global $wpdb,$blog_id;
 				
 		$ismapped = wp_cache_get('wap_mapped_clear_' . $blog_id, 'domain_mapping' );
@@ -71,7 +71,7 @@ function wap_mapped_clear() {
 		}
 		
 		//* string $ismapped, if mapped != ''
-		if ( !empty($ismapped) ) {						
+		if ( !empty($ismapped) ) {
 //			add_action( 'save_post', 'wap_w3tc_flush_single_post' ); // Doesn't work unfortunately with Domain Mapping... somehow 2 ID's are being created?
 			add_action( 'save_post', 'wap_w3tc_flush_page' ); // So we just flush it entirely. But only if the domain is mapped! :D
 		}

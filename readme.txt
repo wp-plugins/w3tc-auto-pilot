@@ -1,5 +1,5 @@
 === W3TC Auto Pilot ===
-Contributors: cybr
+Contributors: Cybr
 Tags: cache, control, w3, total, automatic, flush, update, multisite, mapping, hide
 Requires at least: 3.6.0
 Tested up to: 4.2.2
