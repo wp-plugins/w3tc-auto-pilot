@@ -27,6 +27,7 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 * No more admin menu in the admin bar. 
 * No more admin menu in the dashboard. 
 * No more admin notices in the dashboard after settings change or on error.
+* No more admin script on front end
 
 ***On the front end:***
 
@@ -49,6 +50,9 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 1. That's it! There are currently no options available. 
 
 == Changelog ==
+
+= 1.0.4 =
+* Removed popup admin script if user isn't allowed to control W3TC
 
 = 1.0.3 = 
 * Fine tuned the purging of page cache to only when a domain is actually mapped.

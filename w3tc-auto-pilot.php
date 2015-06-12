@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -40,9 +40,8 @@ function wap_w3tc_init() {
 	//* Removes admin menu entry of W3 Total Cache
 	add_action( 'admin_menu', 'wap_w3tc_remove_adminmenu', 20 );
 	
-	//* Removes admin menu popup script 
-	// Can't be done.
-//	add_action( 'init', 'wap_w3tc_remove_script', 20);
+	//* Removes admin menu popup script
+	add_action( 'init', 'wap_w3tc_remove_script', 20);
 	
 	//* Removes "Purge From Cache" link above the "publish/save" button on posts/pages
 	//* Also removes the "Purge From Cache" link in post/pages lists
@@ -175,13 +174,10 @@ function wap_w3tc_remove_script() {
 		}
 		
 		// Remove popupadmin script
-		// @Frederick, Why did you use wp_print_scripts? See https://codex.wordpress.org/Plugin_API/Action_Reference/wp_print_scripts
-		// Even more so, why did you call the action outside of the constructor?
-		add_action( 'init', array( 
+		remove_action( 'wp_print_scripts', array( 
 			$w3_plugin,
-			'wap_w3tc_remove_script_ext'
+			'popup_script'
 			), 10);
-			// Well, I tried. This doesn't work.
 	}
 }
 
