@@ -27,7 +27,7 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 * No more admin menu in the admin bar. 
 * No more admin menu in the dashboard. 
 * No more admin notices in the dashboard after settings change or on error.
-* No more admin script on front end
+* No more admin script on front end.
 
 ***On the front end:***
 
