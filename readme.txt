@@ -51,6 +51,9 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 
 == Changelog ==
 
+= 1.0.6 =
+* Fixed a bug with Domain Mapping. Make sure Administrative Mapping is set to "Either" or "Mapped Domain".
+
 = 1.0.5 =
 * Made sure the admin bar was removed. It's only removed if you're not admin (single) or super-admin (multisite)
 
