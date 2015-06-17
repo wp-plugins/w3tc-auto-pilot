@@ -51,6 +51,9 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 
 == Changelog ==
 
+= 1.0.5 =
+* Made sure the admin bar was removed. It's only removed if you're not admin (single) or super-admin (multisite)
+
 = 1.0.4 =
 * Removed popup admin script if user isn't allowed to control W3TC
 

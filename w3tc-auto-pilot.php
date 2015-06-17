@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -36,6 +36,7 @@ function wap_w3tc_init() {
 	
 	//* Removes admin bar entry of W3 Total Cache
 	add_action( 'admin_bar_menu', 'wap_w3tc_remove_adminbar', 20 );
+	add_action( 'wp_before_admin_bar_render', 'wap_w3tc_remove_adminbar', 20 );
 	
 	//* Removes admin menu entry of W3 Total Cache
 	add_action( 'admin_menu', 'wap_w3tc_remove_adminmenu', 20 );
@@ -163,6 +164,7 @@ function wap_w3tc_remove_adminbar() {
 	// Remove admin menu
 	if ( !is_super_admin() ) {
 		$wp_admin_bar->remove_menu('w3tc');
+		$wp_admin_bar->remove_node('w3tc');
 	}	
 }
 
