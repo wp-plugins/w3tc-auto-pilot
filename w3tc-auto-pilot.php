@@ -454,7 +454,7 @@ function wap_w3tc_remove_adminmenu() {
 		
 		//* Adds redirect to dashboard home with error if query arg contains w3tc_
 		if (stripos($_SERVER['REQUEST_URI'],'admin.php?page=w3tc_') !== false) {
-			wp_redirect( get_option('siteurl') . '/wp-admin/index.php?w3tc_permission_denied=true'); //Redirects the removal of site with a big fat notice
+			wp_redirect( get_option('siteurl') . '/wp-admin/index.php?w3tc_permission_denied=true'); //Forgot this comment was there :3
 		}
 		
 	}
