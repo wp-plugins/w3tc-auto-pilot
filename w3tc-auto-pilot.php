@@ -145,13 +145,13 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 		//* Get scheme setting of orginal domain
 		$mappedscheme = wp_cache_get('wap_mapped_scheme_' . $blog_id, 'domain_mapping' );
 		if ( false === $scheme ) {
-			$mappedscheme = $wpdb->get_var( $wpdb->prepare( "SELECT scheme FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //string
+			$mappedscheme = $wpdb->get_var( $wpdb->prepare( "SELECT scheme FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //bool
 			wp_cache_set('wap_mapped_scheme_' . $blog_id, $mappedscheme, 'domain_mapping', 3600 ); // 1 hour
 		}
 		
 		//* Get scheme of mapped domain
 		if ($mappedscheme === '1') {
-			$scheme_mapped = 'http://'; //https
+			$scheme_mapped = 'https://';
 		} else if ($mappedscheme === '0') {
 			$scheme_mapped = 'http://';
 		}
@@ -159,9 +159,9 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 		//* Get scheme of orginal domain
 		if ( method_exists( 'Domainmap_Plugin', 'instance' ) ) {
 			$domainmap_instance = Domainmap_Plugin::instance();
-			$schemeoriginal = $domainmap_instance->get_option("map_force_frontend_ssl") ? 'http://' : 'http://'; //https : http
+			$schemeoriginal = $domainmap_instance->get_option("map_force_frontend_ssl") ? 'https://' : 'http://';
 		} else {
-			$schemeoriginal = is_ssl() ? 'http://' : 'http://'; //Fallback, not too reliable. //https : http
+			$schemeoriginal = is_ssl() ? 'https://' : 'http://'; //Fallback, not too reliable.
 		}
 		
 		$relative_url_slash_it = wp_make_link_relative( trailingslashit( get_permalink( $post_ID ) ) );
@@ -454,7 +454,7 @@ function wap_w3tc_remove_adminmenu() {
 		
 		//* Adds redirect to dashboard home with error if query arg contains w3tc_
 		if (stripos($_SERVER['REQUEST_URI'],'admin.php?page=w3tc_') !== false) {
-			wp_redirect( get_option('siteurl') . '/wp-admin/index.php?w3tc_permission_denied=true'); //Forgot this comment was there :3
+			wp_redirect( get_option('siteurl') . '/wp-admin/index.php?w3tc_permission_denied=true');
 		}
 		
 	}
