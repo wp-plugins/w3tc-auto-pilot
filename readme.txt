@@ -25,7 +25,8 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 
 * No more purge from cache button on pages and posts edit screens. 
 * No more admin menu in the admin bar. 
-* No more admin menu in the dashboard. 
+* No more admin menu in the dashboard.
+ * Also denied access with a notice.
 * No more admin notices in the dashboard after settings change or on error.
 * No more admin script on front end.
 
@@ -50,6 +51,12 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 1. That's it! There are currently no options available. 
 
 == Changelog ==
+
+= 1.1.0 =
+* Added flush on Theme Menu change
+* Added textdomain WapPilot for translating
+* Added redirect with notice if an unauthorized user tries to access the W3TC dashboard or any other w3tc page.
+* Cleaned up code and made it more readable for other programmers
 
 = 1.0.6 =
 * Fixed a bug with Domain Mapping. Make sure Administrative Mapping is set to "Either" or "Mapped Domain".
