@@ -136,15 +136,15 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 		$originaldomain = $current_blog->domain;
 		
 		//* Get mapped domain
-		$mappeddomain = wp_cache_get('wap_mapped_clear_' . $blog_id, 'domain_mapping' );
+		$mappeddomain = wp_cache_get('wap_mapped_domain_' . $blog_id, 'domain_mapping' );
 		if ( false === $mappeddomain ) {
 			$mappeddomain = $wpdb->get_var( $wpdb->prepare( "SELECT domain FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //string
-			wp_cache_set('wap_mapped_clear_' . $blog_id, $mappeddomain, 'domain_mapping', 3600 ); // 1 hour
+			wp_cache_set('wap_mapped_domain_' . $blog_id, $mappeddomain, 'domain_mapping', 3600 ); // 1 hour
 		}
 		
-		//* Get scheme setting of orginal domain
+		//* Get scheme setting of mapped domain
 		$mappedscheme = wp_cache_get('wap_mapped_scheme_' . $blog_id, 'domain_mapping' );
-		if ( false === $scheme ) {
+		if ( false === $mappedscheme ) {
 			$mappedscheme = $wpdb->get_var( $wpdb->prepare( "SELECT scheme FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //bool
 			wp_cache_set('wap_mapped_scheme_' . $blog_id, $mappedscheme, 'domain_mapping', 3600 ); // 1 hour
 		}
