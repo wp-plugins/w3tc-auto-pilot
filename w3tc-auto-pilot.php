@@ -435,7 +435,7 @@ function wap_w3tc_remove_script() {
 /**
  * Removes inline css and javascript printed by w3tc in the admin dashboard
  *
- * @since 1.0.4
+ * @since 1.1.1
  */
 function wap_w3tc_remove_styles() {
 	if ( !is_super_admin() ) {
