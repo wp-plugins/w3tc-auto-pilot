@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -88,7 +88,7 @@ add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before i
  */
 function wap_locale_init() {
 	$plugin_dir = basename(dirname(__FILE__));
-	load_plugin_textdomain( 'w3tc-auto-pilot', false, $plugin_dir . '/language/');
+	load_plugin_textdomain( 'WapPilot', false, $plugin_dir . '/language/');
 }
 add_action('plugins_loaded', 'wap_locale_init');
 
@@ -422,13 +422,13 @@ function wap_w3tc_remove_script() {
 		
 		if ( function_exists( 'w3_instance' ) ) {
 			$w3_plugin = w3_instance('W3_Plugin_TotalCache');
-		}
 		
-		// Remove popupadmin script
-		remove_action( 'wp_print_scripts', array( 
-			$w3_plugin,
-			'popup_script'
-			), 10);
+			// Remove popupadmin script
+			remove_action( 'wp_print_scripts', array( 
+				$w3_plugin,
+				'popup_script'
+				), 10);
+		}
 	}
 }
 
@@ -442,16 +442,15 @@ function wap_w3tc_remove_styles() {
 		
 		if ( function_exists( 'w3_instance' ) ) {
 			$w3_plugin = w3_instance('W3_Plugin_TotalCacheAdmin');
-		}
 		
-		// Remove image styles
-		remove_action('admin_head', array(
-            $w3_plugin,
-            'admin_head'
-        ), 10);
+			// Remove image styles
+			remove_action('admin_head', array(
+				$w3_plugin,
+				'admin_head'
+			), 10);
+		}
 	}
 }
-
 
 /**
  * Removes the Performance admin menu
@@ -515,20 +514,21 @@ function wap_no_permissions_admin_notice() { // delete site notice
 function wap_w3tc_remove_flush_per_post_page() {
 	if ( !is_super_admin() ) {
 		
-		if ( function_exists( 'w3_instance' ) )
+		if ( function_exists( 'w3_instance' ) ) {
 			$w3_actions = w3_instance('W3_GeneralActions');
 		
-		// Within /wp-admin/edit.php
-		add_filter('post_row_actions', 'wap_w3tc_remove_row');
-		
-		// Within /wp-admin/edit.php?post_type=page
-		add_filter('page_row_actions', 'wap_w3tc_remove_row');
-		
-		// Within /wp-admin/post.php?post=xxxx&action=edit
-		remove_action('post_submitbox_start', array(
-			$w3_actions,
-			'post_submitbox_start'
-			), 10);
+			// Within /wp-admin/edit.php
+			add_filter('post_row_actions', 'wap_w3tc_remove_row');
+			
+			// Within /wp-admin/edit.php?post_type=page
+			add_filter('page_row_actions', 'wap_w3tc_remove_row');
+			
+			// Within /wp-admin/post.php?post=xxxx&action=edit
+			remove_action('post_submitbox_start', array(
+				$w3_actions,
+				'post_submitbox_start'
+				), 10);
+		}
 	}
 }
 

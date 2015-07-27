@@ -2,8 +2,8 @@
 Contributors: Cybr
 Tags: cache, control, w3, total, automatic, flush, update, multisite, mapping, hide
 Requires at least: 3.6.0
-Tested up to: 4.2.2
-Stable tag: 1.1.1
+Tested up to: 4.2.3
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,10 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 1. That's it! There are currently no options available. 
 
 == Changelog ==
+
+= 1.1.2 =
+* Fixed PHP Warnings when W3TC is deactivated
+* Fixed internationalisation caused by mistake in 1.1.1
 
 = 1.1.1 =
 * Made W3TC completely silent by removing the latest scripts from non-admins (single) / non-super-admins (multi) in wp-admin
