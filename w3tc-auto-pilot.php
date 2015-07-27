@@ -80,15 +80,15 @@ function wap_w3tc_init() {
 add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before init and admin_init
 
 /**
- * Plugin locale 'AutoDescription'
+ * Plugin locale 'WapPilot'
  *
- * File located in plugin folder autodescription/language/
+ * File located in plugin folder w3tc-auto-pilot/language/
  *
  * @since 1.0.0
  */
 function wap_locale_init() {
 	$plugin_dir = basename(dirname(__FILE__));
-	load_plugin_textdomain( 'WapPilot', false, $plugin_dir . '/language/');
+	load_plugin_textdomain( 'w3tc-auto-pilot', false, $plugin_dir . '/language/');
 }
 add_action('plugins_loaded', 'wap_locale_init');
 
