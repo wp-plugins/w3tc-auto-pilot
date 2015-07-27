@@ -3,7 +3,7 @@ Contributors: Cybr
 Tags: cache, control, w3, total, automatic, flush, update, multisite, mapping, hide
 Requires at least: 3.6.0
 Tested up to: 4.2.2
-Stable tag: 4.2.2
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,6 +29,7 @@ It's absolutely great on MultiSite installations, especially when you allow untr
  * Also denied access with a notice.
 * No more admin notices in the dashboard after settings change or on error.
 * No more admin script on front end.
+* No more admin scripts in back end.
 
 ***On the front end:***
 
@@ -51,6 +52,10 @@ It's absolutely great on MultiSite installations, especially when you allow untr
 1. That's it! There are currently no options available. 
 
 == Changelog ==
+
+= 1.1.1 =
+* Made W3TC completely silent by removing the latest scripts from non-admins (single) / non-super-admins (multi) in wp-admin
+* Tested on PHP7
 
 = 1.1.0 =
 * Added flush on Theme Menu change

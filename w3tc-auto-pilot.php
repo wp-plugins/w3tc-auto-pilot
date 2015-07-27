@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -57,6 +57,9 @@ function wap_w3tc_init() {
 	//* Removes admin menu popup script
 	add_action( 'init', 'wap_w3tc_remove_script', 20);
 	
+	//* Removes admin styles
+	add_action( 'admin_init', 'wap_w3tc_remove_styles', 20);
+	
 	//* Removes "Purge From Cache" link above the "publish/save" button on posts/pages
 	//* Also removes the "Purge From Cache" link in post/pages lists
 	add_action( 'admin_init', 'wap_w3tc_remove_flush_per_post_page', 20); 
@@ -77,15 +80,15 @@ function wap_w3tc_init() {
 add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before init and admin_init
 
 /**
- * Plugin locale 'AutoDescription'
+ * Plugin locale 'WapPilot'
  *
- * File located in plugin folder autodescription/language/
+ * File located in plugin folder w3tc-auto-pilot/language/
  *
  * @since 1.0.0
  */
 function wap_locale_init() {
 	$plugin_dir = basename(dirname(__FILE__));
-	load_plugin_textdomain( 'WapPilot', false, $plugin_dir . '/language/');
+	load_plugin_textdomain( 'w3tc-auto-pilot', false, $plugin_dir . '/language/');
 }
 add_action('plugins_loaded', 'wap_locale_init');
 
@@ -98,7 +101,7 @@ add_action('plugins_loaded', 'wap_locale_init');
  */
 function wap_mapped_clear() {
 	//* Check for domain-mapping plugin
-	if ( is_plugin_active( 'domain-mapping/domain-mapping.php' ) ) {
+	if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'domain-mapping/domain-mapping.php' ) ) {
 		global $wpdb,$blog_id;
 				
 		$ismapped = wp_cache_get('wap_mapped_clear_' . $blog_id, 'domain_mapping' );
@@ -428,6 +431,27 @@ function wap_w3tc_remove_script() {
 			), 10);
 	}
 }
+
+/**
+ * Removes inline css and javascript printed by w3tc in the admin dashboard
+ *
+ * @since 1.0.4
+ */
+function wap_w3tc_remove_styles() {
+	if ( !is_super_admin() ) {
+		
+		if ( function_exists( 'w3_instance' ) ) {
+			$w3_plugin = w3_instance('W3_Plugin_TotalCacheAdmin');
+		}
+		
+		// Remove image styles
+		remove_action('admin_head', array(
+            $w3_plugin,
+            'admin_head'
+        ), 10);
+	}
+}
+
 
 /**
  * Removes the Performance admin menu
