@@ -3,7 +3,7 @@
  * Plugin Name: W3TC Auto Pilot
  * Plugin URI: https://wordpress.org/plugins/w3tc-auto-pilot/
  * Description: Put W3 Total Cache on auto pilot. This plugin allows you to control W3 Total Cache in such a manner that no one knows you're using it, not even your admins. Either network activate it or activate it per site.
- * Version: 1.1.2
+ * Version: 1.1.3
  * Author: Sybre Waaijer
  * Author URI: https://cyberwire.nl/
  * License: GPLv2 or later
@@ -14,7 +14,7 @@
 
 /**
  * == Hook reference list ==
- * 
+ *
  * after_switch_theme				=> After theme has switched 										=> Action
  * customize_save_after 			=> After customizer settings have been saved 						=> Action
  * wp_update_nav_menu	 			=> After menu has been updated										=> Action		=> Needs $nav_menu_selected_id
@@ -28,54 +28,55 @@
  * wp_before_admin_bar_render 		=> Before admin bar gets rendered									=> Action
  *
  * admin_menu						=> The admin_menu rendering											=> Action
- *  
+ *
  * post_submitbox_start				=> The submitbox of a post/page										=> Action
  * after_setup_theme				=> Very early call													=> Action
  */
 
-/** 
+/**
  * Initialize this plugin. Uncomment any action you don't wish to use.
  *
  * @since 1.0.0
  */
 function wap_w3tc_init() {
-	
+
 	//* Adds advanced flushing on update of certain items (especially related to object cache)
 	//* Usage of each action hook is documented above under Developer Notes
-	add_action( 'after_switch_theme', 'wap_w3tc_flush_all' );
-	add_action( 'customize_save_after', 'wap_w3tc_flush_all', 20 );
+	add_action( 'after_switch_theme', 'wap_w3tc_flush_all', 5 );
+	add_action( 'customize_save_after', 'wap_w3tc_flush_all', 5 );
+	add_action( 'wp_ajax_customize_save', 'wap_w3tc_flush_all', 20 );
 	add_action( 'wp_update_nav_menu', 'wap_w3tc_flush_menu', 11, 1 );
-	add_filter( 'widget_update_callback', 'wap_w3tc_flush_all_widget', 11, 4 ); // Will not always fire, but does the job :)	
-	
+	add_filter( 'widget_update_callback', 'wap_w3tc_flush_all_widget', 20, 4 ); // Only runs once, so not very effective.
+
 	//* Removes admin bar entry of W3 Total Cache
 	add_action( 'admin_bar_menu', 'wap_w3tc_remove_adminbar', 20 );
 	add_action( 'wp_before_admin_bar_render', 'wap_w3tc_remove_adminbar', 20 );
-	
+
 	//* Removes admin menu entry of W3 Total Cache
 	add_action( 'admin_menu', 'wap_w3tc_remove_adminmenu', 20 );
-	
+
 	//* Removes admin menu popup script
 	add_action( 'init', 'wap_w3tc_remove_script', 20);
-	
+
 	//* Removes admin styles
 	add_action( 'admin_init', 'wap_w3tc_remove_styles', 20);
-	
+
 	//* Removes "Purge From Cache" link above the "publish/save" button on posts/pages
 	//* Also removes the "Purge From Cache" link in post/pages lists
-	add_action( 'admin_init', 'wap_w3tc_remove_flush_per_post_page', 20); 
-	
+	add_action( 'admin_init', 'wap_w3tc_remove_flush_per_post_page', 20);
+
 	//* Removes the W3 Total Cache comments in the HTML output
 	add_filter( 'w3tc_can_print_comment', '__return_false', 20);
-	
+
 	//* Removes admin notices for non-super-admins
 	add_action( 'admin_init', 'wap_w3tc_remove_notices', 20);
-	
+
 	//* Added functionality to prevent cache bugs with Domain Mapping (by WPMUdev)
 	add_action( 'save_post', 'wap_mapped_clear', 20);
-	
+
 	//* Adds a redirect notice if a user still tries to access the w3tc dashboard.
 	add_action( 'admin_init', 'wap_die_notice', 20);
-	
+
 }
 add_action( 'after_setup_theme', 'wap_w3tc_init' ); // Call very early, before init and admin_init
 
@@ -92,7 +93,7 @@ function wap_locale_init() {
 }
 add_action('plugins_loaded', 'wap_locale_init');
 
-/** 
+/**
  * Forces an extra flush on mapped domain.
  *
  * @requires plugin Domain Mapping by WPMUdev
@@ -103,13 +104,13 @@ function wap_mapped_clear() {
 	//* Check for domain-mapping plugin
 	if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'domain-mapping/domain-mapping.php' ) ) {
 		global $wpdb,$blog_id;
-				
+
 		$ismapped = wp_cache_get('wap_mapped_clear_' . $blog_id, 'domain_mapping' );
 		if ( false === $ismapped ) {
 			$ismapped = $wpdb->get_var( $wpdb->prepare( "SELECT domain FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //string
 			wp_cache_set('wap_mapped_clear_' . $blog_id, $ismapped, 'domain_mapping', 3600 ); // 1 hour
 		}
-		
+
 		//* string $ismapped, if mapped != ''
 		// We shouldn't flush the object cache here, otherwise the wp_cache_set is useless above this.
 		if ( !empty($ismapped) ) {
@@ -130,35 +131,35 @@ function wap_mapped_clear() {
  */
 function wap_w3tc_flush_page_mapped( $post_ID ) {
 	global $wpdb, $blog_id, $current_blog;
-	
+
 	$post = get_post( $post_ID );
-	
+
 	//* Check if subdomain install, else just flush all
 	if ((defined('SUBDOMAIN_INSTALL') && SUBDOMAIN_INSTALL) || (defined('VHOST') && VHOST == 'yes')) {
-	
+
 		$originaldomain = $current_blog->domain;
-		
+
 		//* Get mapped domain
 		$mappeddomain = wp_cache_get('wap_mapped_domain_' . $blog_id, 'domain_mapping' );
 		if ( false === $mappeddomain ) {
 			$mappeddomain = $wpdb->get_var( $wpdb->prepare( "SELECT domain FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //string
 			wp_cache_set('wap_mapped_domain_' . $blog_id, $mappeddomain, 'domain_mapping', 3600 ); // 1 hour
 		}
-		
+
 		//* Get scheme setting of mapped domain
 		$mappedscheme = wp_cache_get('wap_mapped_scheme_' . $blog_id, 'domain_mapping' );
 		if ( false === $mappedscheme ) {
 			$mappedscheme = $wpdb->get_var( $wpdb->prepare( "SELECT scheme FROM {$wpdb->base_prefix}domain_mapping WHERE blog_id = %d", $blog_id ) ); //bool
 			wp_cache_set('wap_mapped_scheme_' . $blog_id, $mappedscheme, 'domain_mapping', 3600 ); // 1 hour
 		}
-		
+
 		//* Get scheme of mapped domain
 		if ($mappedscheme === '1') {
 			$scheme_mapped = 'https://';
 		} else if ($mappedscheme === '0') {
 			$scheme_mapped = 'http://';
 		}
-		
+
 		//* Get scheme of orginal domain
 		if ( method_exists( 'Domainmap_Plugin', 'instance' ) ) {
 			$domainmap_instance = Domainmap_Plugin::instance();
@@ -166,12 +167,12 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 		} else {
 			$schemeoriginal = is_ssl() ? 'https://' : 'http://'; //Fallback, not too reliable.
 		}
-		
+
 		$relative_url_slash_it = wp_make_link_relative( trailingslashit( get_permalink( $post_ID ) ) );
 		$relative_url = wp_make_link_relative( get_permalink( $post_ID ) );
-		
+
 		if ( $post->ID == get_option( 'page_on_front' ) ) {
-			$geturls = array(				
+			$geturls = array(
 				$mappeddomain, // example: mappedomain.com
 				$scheme_mapped . $mappeddomain, // example: http://mappedomain.com
 				$originaldomain, // example: subdomain.maindomain.com
@@ -181,34 +182,34 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 			$geturls = array (
 				$mappeddomain . $relative_url, // example: mappedomain.com/some-post(/)
 				$mappeddomain . $relative_url_slash_it, // example: mappedomain.com/some-post/
-				
+
 				$scheme_mapped .  $mappeddomain . $relative_url, // example: http://mappedomain.com/some-post(/)
 				$scheme_mapped .  $mappeddomain . $relative_url_slash_it, // example: http://mappedomain.com/some-post/
-				
+
 				$originaldomain . $relative_url, // example: subdomain.maindomain.com/some-post(/)
 				$originaldomain . $relative_url_slash_it, // example: subdomain.maindomain.com/some-post/
-				
+
 				$schemeoriginal . $originaldomain . $relative_url, // example: https://subdomain.maindomain.com/some-post(/)
 				$schemeoriginal . $originaldomain . $relative_url_slash_it, // example: https://subdomain.maindomain.com/some-post/
 			);
 		}
-		
+
 		//* Flush both mapped and original
 		foreach ( $geturls as $key => $url ) {
 			if ( function_exists( 'w3tc_pgcache_flush_url' ) )
 				w3tc_pgcache_flush_url( $url );
-			
+
 			if ( function_exists( 'w3tc_pgcache_flush_post' ) ) {
 				w3tc_pgcache_flush_post( $post_ID );
 				w3tc_pgcache_flush_post( $post_id = null );
 			}
-			
-			if ( function_exists( 'w3_instance' ) ) {	
+
+			if ( function_exists( 'w3_instance' ) ) {
 				$w3_pgcache = w3_instance('W3_CacheFlush');
 				return $w3_pgcache->prime_post($post_ID);
 			}
 		}
-		
+
 		/**
 		 * There are only two hard things in Computer Science: cache invalidation and naming things.
 		 * -- Phil Karlton
@@ -217,7 +218,7 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 		 *  + Cache IS invalidated. This is good.
 		 *	- Old cache file/chunk still exists.
 		 *	- Cache ISN'T rebuilt. So the invalid cache is loaded upon request until the ORIGINAL url fetches it.
-		 *	- ORIGINAL url can't be requested (on visit), this is because the domain is mapped. 
+		 *	- ORIGINAL url can't be requested (on visit), this is because the domain is mapped.
 		 *	- Old cache stays in there until explicit expiration date sent in the cron as set in the w3 total cache settings.
 		 *
 		 * The solution:
@@ -226,7 +227,7 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 		 *
 		 * This is a serious bug that should've been addressed a few years ago. This url clearing thing simply doesn't work.
 		 */
-		 
+
 		/**
 		 * The original functions
 		 * @param url
@@ -241,10 +242,10 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 			if (!isset($referrer_groups)) $referrer_groups = $this->_get_referrer_groups();
 			if (!isset($encryptions)) $encryptions = $this->_get_encryptions();
 			if (!isset($compressions)) $compressions = $this->_get_compressions();
-			
+
 			$this->_flush_url($url, $cache, $mobile_groups, $referrer_groups, $encryptions, $compressions);
 		}
-		
+
 		function _flush_url($url, $cache, $mobile_groups, $referrer_groups, $encryptions, $compressions) {
 			foreach ($mobile_groups as $mobile_group) {
 				foreach ($referrer_groups as $referrer_group) {
@@ -256,46 +257,51 @@ function wap_w3tc_flush_page_mapped( $post_ID ) {
 					}
 				}
 			}
-		}		
+		}
 		*/
 
 	} else {
-		
+
 		// Purge the entire page cache (current domain)
 		// This should be more elaborated, but I don't have the resources or time to apply this.
 		if ( function_exists( 'w3tc_pgcache_flush' ) )
 			w3tc_pgcache_flush();
-	
+
 	}
 }
 
-/** 
+/**
  * Runs all flushes
  *
  * @since 1.0.0
  */
 function wap_w3tc_flush_all() {
-	
+
+	// Flush all
+	if ( function_exists( 'w3tc_flush_all' ) ) {
+		w3tc_flush_all();
+	}
+/*
 	// Purge the entire db cache
 	if ( function_exists( 'w3tc_dbcache_flush' ) ) {
 		w3tc_dbcache_flush();
 	}
-	
+
 	// Purge the entire object cache
 	if ( function_exists( 'w3tc_objectcache_flush' ) ) {
 		w3tc_objectcache_flush();
 	}
-	
+
 	// Purge the entire minify cache
 	if ( function_exists( 'w3tc_minify_flush' ) ) {
 		w3tc_minify_flush();
-	}	
-	
+	}
+
 	// Purge the entire page cache
 	if ( function_exists( 'w3tc_pgcache_flush' ) ) {
 		w3tc_pgcache_flush();
 	}
-	
+*/
 }
 
 /**
@@ -306,22 +312,22 @@ function wap_w3tc_flush_all() {
  * @since 1.1.0
  */
 function wap_w3tc_flush_menu( $nav_menu_selected_id = array() ) {
-	
+
 	// Purge the entire db cache
 	if ( function_exists( 'w3tc_dbcache_flush' ) ) {
 		w3tc_dbcache_flush();
 	}
-	
+
 	// Purge the entire object cache
 	if ( function_exists( 'w3tc_objectcache_flush' ) ) {
 		w3tc_objectcache_flush();
 	}
-		
+
 	// Purge the entire page cache
 	if ( function_exists( 'w3tc_pgcache_flush' ) ) {
 		w3tc_pgcache_flush();
 	}
-	
+
 }
 
 /**
@@ -335,27 +341,27 @@ function wap_w3tc_flush_menu( $nav_menu_selected_id = array() ) {
  * @since 1.0.0
  */
 function wap_w3tc_flush_all_widget($instance, $new_instance, $old_instance, $this) {
-	
+
 	// Purge the entire db cache
 	if ( function_exists( 'w3tc_dbcache_flush' ) ) {
 		w3tc_dbcache_flush();
 	}
-	
+
 	// Purge the entire object cache
 	if ( function_exists( 'w3tc_objectcache_flush' ) ) {
 		w3tc_objectcache_flush();
 	}
-	
+
 	// Purge the entire minify cache
 	if ( function_exists( 'w3tc_minify_flush' ) ) {
 		w3tc_minify_flush();
-	}	
-	
+	}
+
 	// Purge the entire page cache
 	if ( function_exists( 'w3tc_pgcache_flush' ) ) {
 		w3tc_pgcache_flush();
 	}
-	
+
 	//* Pass $instance to parse updating
 	return $instance;
 }
@@ -368,15 +374,15 @@ function wap_w3tc_flush_all_widget($instance, $new_instance, $old_instance, $thi
  * @since 1.0.2
  */
 function wap_w3tc_flush_single_post() {
-	
+
 	// Purge the single page cache
 	if ( function_exists( 'w3tc_pgcache_flush_post' ) ) {
 		global $post;
 		$post_id = $post->ID;
-			
+
 		w3tc_pgcache_flush_post($post_id);
 	}
-	
+
 }
 
 /**
@@ -387,12 +393,12 @@ function wap_w3tc_flush_single_post() {
  * @since 1.0.0
  */
 function wap_w3tc_flush_object() {
-			
+
 	// Purge the entire object cache
 	if ( function_exists( 'w3tc_objectcache_flush' ) ) {
 		w3tc_objectcache_flush();
 	}
-	
+
 }
 
 /**
@@ -404,12 +410,12 @@ function wap_w3tc_flush_object() {
  */
 function wap_w3tc_remove_adminbar() {
 	global $wp_admin_bar;
-	
+
 	// Remove admin menu
 	if ( !is_super_admin() ) {
 		$wp_admin_bar->remove_menu('w3tc');
 		$wp_admin_bar->remove_node('w3tc');
-	}	
+	}
 }
 
 /**
@@ -419,12 +425,12 @@ function wap_w3tc_remove_adminbar() {
  */
 function wap_w3tc_remove_script() {
 	if ( !is_super_admin() ) {
-		
+
 		if ( function_exists( 'w3_instance' ) ) {
 			$w3_plugin = w3_instance('W3_Plugin_TotalCache');
-		
+
 			// Remove popupadmin script
-			remove_action( 'wp_print_scripts', array( 
+			remove_action( 'wp_print_scripts', array(
 				$w3_plugin,
 				'popup_script'
 				), 10);
@@ -439,10 +445,10 @@ function wap_w3tc_remove_script() {
  */
 function wap_w3tc_remove_styles() {
 	if ( !is_super_admin() ) {
-		
+
 		if ( function_exists( 'w3_instance' ) ) {
 			$w3_plugin = w3_instance('W3_Plugin_TotalCacheAdmin');
-		
+
 			// Remove image styles
 			remove_action('admin_head', array(
 				$w3_plugin,
@@ -462,9 +468,9 @@ function wap_w3tc_remove_styles() {
  */
 function wap_w3tc_remove_adminmenu() {
 	global $submenu,$menu;
-	
+
 	if ( ! is_super_admin() ) {
-		
+
 		if ( ! empty($menu) ) {
 			foreach($menu as $key => $submenuitem) {
 			if( __($submenuitem[0]) == __('Performance') || $submenuitem[2] == "w3tc_dashboard") {
@@ -474,14 +480,14 @@ function wap_w3tc_remove_adminmenu() {
 				}
 			}
 		}
-		
+
 		//* Adds redirect to dashboard home with error if query arg contains w3tc_
 		if (stripos($_SERVER['REQUEST_URI'],'admin.php?page=w3tc_') !== false) {
 			wp_redirect( get_option('siteurl') . '/wp-admin/index.php?w3tc_permission_denied=true');
 		}
-		
+
 	}
-	
+
 }
 
 /**
@@ -513,16 +519,16 @@ function wap_no_permissions_admin_notice() { // delete site notice
  */
 function wap_w3tc_remove_flush_per_post_page() {
 	if ( !is_super_admin() ) {
-		
+
 		if ( function_exists( 'w3_instance' ) ) {
 			$w3_actions = w3_instance('W3_GeneralActions');
-		
+
 			// Within /wp-admin/edit.php
 			add_filter('post_row_actions', 'wap_w3tc_remove_row');
-			
+
 			// Within /wp-admin/edit.php?post_type=page
 			add_filter('page_row_actions', 'wap_w3tc_remove_row');
-			
+
 			// Within /wp-admin/post.php?post=xxxx&action=edit
 			remove_action('post_submitbox_start', array(
 				$w3_actions,
@@ -539,7 +545,7 @@ function wap_w3tc_remove_flush_per_post_page() {
  */
 function wap_w3tc_remove_row($actions) {
 	unset( $actions['pgcache_purge'] );
-	
+
 	return $actions;
 }
 
